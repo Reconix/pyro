@@ -1,41 +1,29 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP
+ * An open source application development framework for PHP 5.2.4 or newer
  *
- * This content is released under the MIT License (MIT)
+ * NOTICE OF LICENSE
  *
- * Copyright (c) 2014 - 2016, British Columbia Institute of Technology
+ * Licensed under the Open Software License version 3.0
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This source file is subject to the Open Software License (OSL 3.0) that is
+ * bundled with this package in the files license.txt / license.rst.  It is
+ * also available through the world wide web at this URL:
+ * http://opensource.org/licenses/OSL-3.0
+ * If you did not receive a copy of the license and are unable to obtain it
+ * through the world wide web, please send an email to
+ * licensing@ellislab.com so we can send you a copy immediately.
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @package	CodeIgniter
- * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
- * @license	http://opensource.org/licenses/MIT	MIT License
- * @link	https://codeigniter.com
- * @since	Version 1.0.0
+ * @package		CodeIgniter
+ * @author		EllisLab Dev Team
+ * @copyright	Copyright (c) 2008 - 2012, EllisLab, Inc. (http://ellislab.com/)
+ * @license		http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
+ * @link		http://codeigniter.com
+ * @since		Version 1.0
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
  * CodeIgniter Download Helpers
@@ -44,7 +32,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Helpers
  * @category	Helpers
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/helpers/download_helper.html
+ * @link		http://codeigniter.com/user_guide/helpers/download_helper.html
  */
 
 // ------------------------------------------------------------------------
@@ -65,22 +53,7 @@ if ( ! function_exists('force_download'))
 	{
 		if ($filename === '' OR $data === '')
 		{
-			return;
-		}
-		elseif ($data === NULL)
-		{
-			if ( ! @is_file($filename) OR ($filesize = @filesize($filename)) === FALSE)
-			{
-				return;
-			}
-
-			$filepath = $filename;
-			$filename = explode('/', str_replace(DIRECTORY_SEPARATOR, '/', $filename));
-			$filename = end($filename);
-		}
-		else
-		{
-			$filesize = strlen($data);
+			return FALSE;
 		}
 
 		// Set the default MIME type to send
@@ -96,7 +69,7 @@ if ( ! function_exists('force_download'))
 				/* If we're going to detect the MIME type,
 				 * we'll need a file extension.
 				 */
-				return;
+				return FALSE;
 			}
 
 			// Load the mime types
@@ -121,15 +94,10 @@ if ( ! function_exists('force_download'))
 			$filename = implode('.', $x);
 		}
 
-		if ($data === NULL && ($fp = @fopen($filepath, 'rb')) === FALSE)
-		{
-			return;
-		}
-
 		// Clean output buffer
-		if (ob_get_level() !== 0 && @ob_end_clean() === FALSE)
+		if (ob_get_level() !== 0)
 		{
-			@ob_clean();
+			ob_clean();
 		}
 
 		// Generate the server headers
@@ -137,22 +105,22 @@ if ( ! function_exists('force_download'))
 		header('Content-Disposition: attachment; filename="'.$filename.'"');
 		header('Expires: 0');
 		header('Content-Transfer-Encoding: binary');
-		header('Content-Length: '.$filesize);
-		header('Cache-Control: private, no-transform, no-store, must-revalidate');
+		header('Content-Length: '.strlen($data));
 
-		// If we have raw data - just dump it
-		if ($data !== NULL)
+		// Internet Explorer-specific headers
+		if (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== FALSE)
 		{
-			exit($data);
+			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header('Pragma: public');
+		}
+		else
+		{
+			header('Pragma: no-cache');
 		}
 
-		// Flush 1MB chunks of data
-		while ( ! feof($fp) && ($data = fread($fp, 1048576)) !== FALSE)
-		{
-			echo $data;
-		}
-
-		fclose($fp);
-		exit;
+		exit($data);
 	}
 }
+
+/* End of file download_helper.php */
+/* Location: ./system/helpers/download_helper.php */

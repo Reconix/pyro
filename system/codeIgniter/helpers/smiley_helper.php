@@ -1,41 +1,29 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP
+ * An open source application development framework for PHP 5.2.4 or newer
  *
- * This content is released under the MIT License (MIT)
+ * NOTICE OF LICENSE
  *
- * Copyright (c) 2014 - 2016, British Columbia Institute of Technology
+ * Licensed under the Open Software License version 3.0
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This source file is subject to the Open Software License (OSL 3.0) that is
+ * bundled with this package in the files license.txt / license.rst.  It is
+ * also available through the world wide web at this URL:
+ * http://opensource.org/licenses/OSL-3.0
+ * If you did not receive a copy of the license and are unable to obtain it
+ * through the world wide web, please send an email to
+ * licensing@ellislab.com so we can send you a copy immediately.
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @package	CodeIgniter
- * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
- * @license	http://opensource.org/licenses/MIT	MIT License
- * @link	https://codeigniter.com
- * @since	Version 1.0.0
+ * @package		CodeIgniter
+ * @author		EllisLab Dev Team
+ * @copyright	Copyright (c) 2008 - 2012, EllisLab, Inc. (http://ellislab.com/)
+ * @license		http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
+ * @link		http://codeigniter.com
+ * @since		Version 1.0
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
  * CodeIgniter Smiley Helpers
@@ -44,8 +32,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Helpers
  * @category	Helpers
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/helpers/smiley_helper.html
- * @deprecated	3.0.0	This helper is too specific for CI.
+ * @link		http://codeigniter.com/user_guide/helpers/smiley_helper.html
  */
 
 // ------------------------------------------------------------------------
@@ -126,13 +113,12 @@ EOF;
 			}
 		}
 
-		return ($inline)
-			? '<script type="text/javascript" charset="utf-8">/*<![CDATA[ */'.$r.'// ]]></script>'
-			: $r;
+		return ($inline) ? '<script type="text/javascript" charset="utf-8">/*<![CDATA[ */'.$r.'// ]]></script>' : $r;
 	}
 }
 
 // ------------------------------------------------------------------------
+
 
 if ( ! function_exists('get_clickable_smileys'))
 {
@@ -144,9 +130,10 @@ if ( ! function_exists('get_clickable_smileys'))
 	 *
 	 * @param	string	the URL to the folder containing the smiley images
 	 * @param	array
+	 * @param	array
 	 * @return	array
 	 */
-	function get_clickable_smileys($image_url, $alias = '')
+	function get_clickable_smileys($image_url, $alias = '', $smileys = NULL)
 	{
 		// For backward compatibility with js_insert_smiley
 		if (is_array($alias))
@@ -155,7 +142,7 @@ if ( ! function_exists('get_clickable_smileys'))
 		}
 		elseif (FALSE === ($smileys = _get_smiley_array()))
 		{
-			return FALSE;
+			return $smileys;
 		}
 
 		// Add a trailing slash to the file path if needed
@@ -227,29 +214,18 @@ if ( ! function_exists('_get_smiley_array'))
 	 */
 	function _get_smiley_array()
 	{
-		static $_smileys;
-
-		if ( ! is_array($_smileys))
+		if (defined('ENVIRONMENT') && file_exists(APPPATH.'config/'.ENVIRONMENT.'/smileys.php'))
 		{
-			if (file_exists(APPPATH.'config/smileys.php'))
-			{
-				include(APPPATH.'config/smileys.php');
-			}
-
-			if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/smileys.php'))
-			{
-				include(APPPATH.'config/'.ENVIRONMENT.'/smileys.php');
-			}
-
-			if (empty($smileys) OR ! is_array($smileys))
-			{
-				$_smileys = array();
-				return FALSE;
-			}
-
-			$_smileys = $smileys;
+			include(APPPATH.'config/'.ENVIRONMENT.'/smileys.php');
+		}
+		elseif (file_exists(APPPATH.'config/smileys.php'))
+		{
+			include(APPPATH.'config/smileys.php');
 		}
 
-		return $_smileys;
+		return (isset($smileys) && is_array($smileys)) ? $smileys : FALSE;
 	}
 }
+
+/* End of file smiley_helper.php */
+/* Location: ./system/helpers/smiley_helper.php */

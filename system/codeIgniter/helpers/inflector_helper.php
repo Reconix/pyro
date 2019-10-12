@@ -1,41 +1,29 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP
+ * An open source application development framework for PHP 5.2.4 or newer
  *
- * This content is released under the MIT License (MIT)
+ * NOTICE OF LICENSE
  *
- * Copyright (c) 2014 - 2016, British Columbia Institute of Technology
+ * Licensed under the Open Software License version 3.0
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This source file is subject to the Open Software License (OSL 3.0) that is
+ * bundled with this package in the files license.txt / license.rst.  It is
+ * also available through the world wide web at this URL:
+ * http://opensource.org/licenses/OSL-3.0
+ * If you did not receive a copy of the license and are unable to obtain it
+ * through the world wide web, please send an email to
+ * licensing@ellislab.com so we can send you a copy immediately.
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @package	CodeIgniter
- * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
- * @license	http://opensource.org/licenses/MIT	MIT License
- * @link	https://codeigniter.com
- * @since	Version 1.0.0
+ * @package		CodeIgniter
+ * @author		EllisLab Dev Team
+ * @copyright	Copyright (c) 2008 - 2012, EllisLab, Inc. (http://ellislab.com/)
+ * @license		http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
+ * @link		http://codeigniter.com
+ * @since		Version 1.0
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
  * CodeIgniter Inflector Helpers
@@ -44,7 +32,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Helpers
  * @category	Helpers
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/helpers/inflector_helper.html
+ * @link		http://codeigniter.com/user_guide/helpers/inflector_helper.html
  */
 
 // --------------------------------------------------------------------
@@ -56,7 +44,7 @@ if ( ! function_exists('singular'))
 	 *
 	 * Takes a plural word and makes it singular
 	 *
-	 * @param	string	$str	Input string
+	 * @param	string
 	 * @return	string
 	 */
 	function singular($str)
@@ -69,33 +57,33 @@ if ( ! function_exists('singular'))
 		}
 
 		$singular_rules = array(
-			'/(matr)ices$/'		=> '\1ix',
-			'/(vert|ind)ices$/'	=> '\1ex',
-			'/^(ox)en/'		=> '\1',
-			'/(alias)es$/'		=> '\1',
-			'/([octop|vir])i$/'	=> '\1us',
-			'/(cris|ax|test)es$/'	=> '\1is',
-			'/(shoe)s$/'		=> '\1',
-			'/(o)es$/'		=> '\1',
-			'/(bus|campus)es$/'	=> '\1',
-			'/([m|l])ice$/'		=> '\1ouse',
-			'/(x|ch|ss|sh)es$/'	=> '\1',
-			'/(m)ovies$/'		=> '\1\2ovie',
-			'/(s)eries$/'		=> '\1\2eries',
-			'/([^aeiouy]|qu)ies$/'	=> '\1y',
-			'/([lr])ves$/'		=> '\1f',
-			'/(tive)s$/'		=> '\1',
-			'/(hive)s$/'		=> '\1',
-			'/([^f])ves$/'		=> '\1fe',
-			'/(^analy)ses$/'	=> '\1sis',
+			'/(matr)ices$/'         => '\1ix',
+			'/(vert|ind)ices$/'     => '\1ex',
+			'/^(ox)en/'             => '\1',
+			'/(alias)es$/'          => '\1',
+			'/([octop|vir])i$/'     => '\1us',
+			'/(cris|ax|test)es$/'   => '\1is',
+			'/(shoe)s$/'            => '\1',
+			'/(o)es$/'              => '\1',
+			'/(bus|campus)es$/'     => '\1',
+			'/([m|l])ice$/'         => '\1ouse',
+			'/(x|ch|ss|sh)es$/'     => '\1',
+			'/(m)ovies$/'           => '\1\2ovie',
+			'/(s)eries$/'           => '\1\2eries',
+			'/([^aeiouy]|qu)ies$/'  => '\1y',
+			'/([lr])ves$/'          => '\1f',
+			'/(tive)s$/'            => '\1',
+			'/(hive)s$/'            => '\1',
+			'/([^f])ves$/'          => '\1fe',
+			'/(^analy)ses$/'        => '\1sis',
 			'/((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$/' => '\1\2sis',
-			'/([ti])a$/'		=> '\1um',
-			'/(p)eople$/'		=> '\1\2erson',
-			'/(m)en$/'		=> '\1an',
-			'/(s)tatuses$/'		=> '\1\2tatus',
-			'/(c)hildren$/'		=> '\1\2hild',
-			'/(n)ews$/'		=> '\1\2ews',
-			'/([^us])s$/'		=> '\1'
+			'/([ti])a$/'            => '\1um',
+			'/(p)eople$/'           => '\1\2erson',
+			'/(m)en$/'              => '\1an',
+			'/(s)tatuses$/'         => '\1\2tatus',
+			'/(c)hildren$/'         => '\1\2hild',
+			'/(n)ews$/'             => '\1\2ews',
+			'/([^us])s$/'           => '\1',
 		);
 
 		foreach ($singular_rules as $rule => $replacement)
@@ -120,10 +108,11 @@ if ( ! function_exists('plural'))
 	 *
 	 * Takes a singular word and makes it plural
 	 *
-	 * @param	string	$str	Input string
+	 * @param	string
+	 * @param	bool
 	 * @return	string
 	 */
-	function plural($str)
+	function plural($str, $force = FALSE)
 	{
 		$result = strval($str);
 
@@ -133,7 +122,6 @@ if ( ! function_exists('plural'))
 		}
 
 		$plural_rules = array(
-			'/(quiz)$/'                => '\1zes',      // quizzes
 			'/^(ox)$/'                 => '\1\2en',     // ox
 			'/([m|l])ouse$/'           => '\1ice',      // mouse, louse
 			'/(matr|vert|ind)ix|ex$/'  => '\1ices',     // matrix, vertex, index
@@ -177,7 +165,7 @@ if ( ! function_exists('camelize'))
 	 *
 	 * Takes multiple words separated by spaces or underscores and camelizes them
 	 *
-	 * @param	string	$str	Input string
+	 * @param	string
 	 * @return	string
 	 */
 	function camelize($str)
@@ -195,12 +183,12 @@ if ( ! function_exists('underscore'))
 	 *
 	 * Takes multiple words separated by spaces and underscores them
 	 *
-	 * @param	string	$str	Input string
+	 * @param	string
 	 * @return	string
 	 */
 	function underscore($str)
 	{
-		return preg_replace('/[\s]+/', '_', trim(MB_ENABLED ? mb_strtolower($str) : strtolower($str)));
+		return preg_replace('/[\s]+/', '_', strtolower(trim($str)));
 	}
 }
 
@@ -213,13 +201,13 @@ if ( ! function_exists('humanize'))
 	 *
 	 * Takes multiple words separated by the separator and changes them to spaces
 	 *
-	 * @param	string	$str		Input string
-	 * @param 	string	$separator	Input separator
+	 * @param	string	$str
+	 * @param 	string	$separator
 	 * @return	string
 	 */
 	function humanize($str, $separator = '_')
 	{
-		return ucwords(preg_replace('/['.preg_quote($separator).']+/', ' ', trim(MB_ENABLED ? mb_strtolower($str) : strtolower($str))));
+		return ucwords(preg_replace('/['.$separator.']+/', ' ', strtolower(trim($str))));
 	}
 }
 
@@ -230,17 +218,19 @@ if ( ! function_exists('is_countable'))
 	/**
 	 * Checks if the given word has a plural version.
 	 *
-	 * @param	string	$word	Word to check
-	 * @return	bool
+	 * @param	string	the word to check
+	 * @return	bool	if the word is countable
 	 */
 	function is_countable($word)
 	{
-		return ! in_array(
-			strtolower($word),
-			array(
-				'equipment', 'information', 'rice', 'money',
-				'species', 'series', 'fish', 'meta'
-			)
-		);
+		return ! in_array(strtolower(strval($word)),
+					array(
+						'equipment', 'information', 'rice', 'money',
+						'species', 'series', 'fish', 'meta'
+					)
+			);
 	}
 }
+
+/* End of file inflector_helper.php */
+/* Location: ./system/helpers/inflector_helper.php */

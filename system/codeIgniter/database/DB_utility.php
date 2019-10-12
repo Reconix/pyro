@@ -1,93 +1,52 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP
+ * An open source application development framework for PHP 5.2.4 or newer
  *
- * This content is released under the MIT License (MIT)
+ * NOTICE OF LICENSE
  *
- * Copyright (c) 2014 - 2016, British Columbia Institute of Technology
+ * Licensed under the Open Software License version 3.0
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This source file is subject to the Open Software License (OSL 3.0) that is
+ * bundled with this package in the files license.txt / license.rst.  It is
+ * also available through the world wide web at this URL:
+ * http://opensource.org/licenses/OSL-3.0
+ * If you did not receive a copy of the license and are unable to obtain it
+ * through the world wide web, please send an email to
+ * licensing@ellislab.com so we can send you a copy immediately.
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @package	CodeIgniter
- * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
- * @license	http://opensource.org/licenses/MIT	MIT License
- * @link	https://codeigniter.com
- * @since	Version 1.0.0
+ * @package		CodeIgniter
+ * @author		EllisLab Dev Team
+ * @copyright	Copyright (c) 2008 - 2012, EllisLab, Inc. (http://ellislab.com/)
+ * @license		http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
+ * @link		http://codeigniter.com
+ * @since		Version 1.0
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
  * Database Utility Class
  *
  * @category	Database
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/database/
+ * @link		http://codeigniter.com/user_guide/database/
  */
-abstract class CI_DB_utility {
+abstract class CI_DB_utility extends CI_DB_forge {
 
-	/**
-	 * Database object
-	 *
-	 * @var	object
-	 */
-	protected $db;
+	public $db;
 
-	// --------------------------------------------------------------------
-
-	/**
-	 * List databases statement
-	 *
-	 * @var	string
-	 */
-	protected $_list_databases		= FALSE;
-
-	/**
-	 * OPTIMIZE TABLE statement
-	 *
-	 * @var	string
-	 */
+	// Platform specific SQL strings
+	// Just setting those defaults to FALSE as they are mostly MySQL-specific
 	protected $_optimize_table	= FALSE;
-
-	/**
-	 * REPAIR TABLE statement
-	 *
-	 * @var	string
-	 */
 	protected $_repair_table	= FALSE;
 
-	// --------------------------------------------------------------------
-
-	/**
-	 * Class constructor
-	 *
-	 * @param	object	&$db	Database object
-	 * @return	void
-	 */
-	public function __construct(&$db)
+	public function __construct()
 	{
-		$this->db =& $db;
-		log_message('info', 'Database Utility Class Initialized');
+		// Assign the main database object to $this->db
+		$CI =& get_instance();
+		$this->db =& $CI->db;
+		log_message('debug', 'Database Utility Class Initialized');
 	}
 
 	// --------------------------------------------------------------------
@@ -106,7 +65,7 @@ abstract class CI_DB_utility {
 		}
 		elseif ($this->_list_databases === FALSE)
 		{
-			return ($this->db->db_debug) ? $this->db->display_error('db_unsupported_feature') : FALSE;
+			return ($this->db->db_debug) ? $this->db->display_error('db_unsuported_feature') : FALSE;
 		}
 
 		$this->db->data_cache['db_names'] = array();
@@ -117,9 +76,9 @@ abstract class CI_DB_utility {
 			return $this->db->data_cache['db_names'];
 		}
 
-		for ($i = 0, $query = $query->result_array(), $c = count($query); $i < $c; $i++)
+		for ($i = 0, $c = count($query); $i < $c; $i++)
 		{
-			$this->db->data_cache['db_names'][] = current($query[$i]);
+			$this->db->data_cache['db_names'] = current($query[$i]);
 		}
 
 		return $this->db->data_cache['db_names'];
@@ -130,7 +89,7 @@ abstract class CI_DB_utility {
 	/**
 	 * Determine if a particular database exists
 	 *
-	 * @param	string	$database_name
+	 * @param	string
 	 * @return	bool
 	 */
 	public function database_exists($database_name)
@@ -143,21 +102,21 @@ abstract class CI_DB_utility {
 	/**
 	 * Optimize Table
 	 *
-	 * @param	string	$table_name
+	 * @param	string	the table name
 	 * @return	mixed
 	 */
 	public function optimize_table($table_name)
 	{
 		if ($this->_optimize_table === FALSE)
 		{
-			return ($this->db->db_debug) ? $this->db->display_error('db_unsupported_feature') : FALSE;
+			return ($this->db->db_debug) ? $this->db->display_error('db_unsuported_feature') : FALSE;
 		}
 
 		$query = $this->db->query(sprintf($this->_optimize_table, $this->db->escape_identifiers($table_name)));
 		if ($query !== FALSE)
 		{
 			$query = $query->result_array();
-			return current($query);
+			return current($res);
 		}
 
 		return FALSE;
@@ -174,7 +133,7 @@ abstract class CI_DB_utility {
 	{
 		if ($this->_optimize_table === FALSE)
 		{
-			return ($this->db->db_debug) ? $this->db->display_error('db_unsupported_feature') : FALSE;
+			return ($this->db->db_debug) ? $this->db->display_error('db_unsuported_feature') : FALSE;
 		}
 
 		$result = array();
@@ -204,14 +163,14 @@ abstract class CI_DB_utility {
 	/**
 	 * Repair Table
 	 *
-	 * @param	string	$table_name
+	 * @param	string	the table name
 	 * @return	mixed
 	 */
 	public function repair_table($table_name)
 	{
 		if ($this->_repair_table === FALSE)
 		{
-			return ($this->db->db_debug) ? $this->db->display_error('db_unsupported_feature') : FALSE;
+			return ($this->db->db_debug) ? $this->db->display_error('db_unsuported_feature') : FALSE;
 		}
 
 		$query = $this->db->query(sprintf($this->_repair_table, $this->db->escape_identifiers($table_name)));
@@ -229,10 +188,10 @@ abstract class CI_DB_utility {
 	/**
 	 * Generate CSV from a query result object
 	 *
-	 * @param	object	$query		Query result object
-	 * @param	string	$delim		Delimiter (default: ,)
-	 * @param	string	$newline	Newline character (default: \n)
-	 * @param	string	$enclosure	Enclosure (default: ")
+	 * @param	object	The query result object
+	 * @param	string	The delimiter - comma by default
+	 * @param	string	The newline character - \n by default
+	 * @param	string	The enclosure - double quote by default
 	 * @return	string
 	 */
 	public function csv_from_result($query, $delim = ',', $newline = "\n", $enclosure = '"')
@@ -249,17 +208,16 @@ abstract class CI_DB_utility {
 			$out .= $enclosure.str_replace($enclosure, $enclosure.$enclosure, $name).$enclosure.$delim;
 		}
 
-		$out = substr($out, 0, -strlen($delim)).$newline;
+		$out = rtrim($out).$newline;
 
 		// Next blast through the result array and build out the rows
 		while ($row = $query->unbuffered_row('array'))
 		{
-			$line = array();
 			foreach ($row as $item)
 			{
-				$line[] = $enclosure.str_replace($enclosure, $enclosure.$enclosure, $item).$enclosure;
+				$out .= $enclosure.str_replace($enclosure, $enclosure.$enclosure, $item).$enclosure.$delim;
 			}
-			$out .= implode($delim, $line).$newline;
+			$out = rtrim($out).$newline;
 		}
 
 		return $out;
@@ -270,8 +228,8 @@ abstract class CI_DB_utility {
 	/**
 	 * Generate XML data from a query result object
 	 *
-	 * @param	object	$query	Query result object
-	 * @param	array	$params	Any preferences
+	 * @param	object	The query result object
+	 * @param	array	Any preferences
 	 * @return	string
 	 */
 	public function xml_from_result($query, $params = array())
@@ -294,7 +252,8 @@ abstract class CI_DB_utility {
 		extract($params);
 
 		// Load the xml helper
-		get_instance()->load->helper('xml');
+		$CI =& get_instance();
+		$CI->load->helper('xml');
 
 		// Generate the result
 		$xml = '<'.$root.'>'.$newline;
@@ -316,8 +275,7 @@ abstract class CI_DB_utility {
 	/**
 	 * Database Backup
 	 *
-	 * @param	array	$params
-	 * @return	string
+	 * @return	void
 	 */
 	public function backup($params = array())
 	{
@@ -329,17 +287,18 @@ abstract class CI_DB_utility {
 			$params = array('tables' => $params);
 		}
 
+		// ------------------------------------------------------
+
 		// Set up our default preferences
 		$prefs = array(
-			'tables'		=> array(),
-			'ignore'		=> array(),
-			'filename'		=> '',
-			'format'		=> 'gzip', // gzip, zip, txt
-			'add_drop'		=> TRUE,
-			'add_insert'		=> TRUE,
-			'newline'		=> "\n",
-			'foreign_key_checks'	=> TRUE
-		);
+				'tables'		=> array(),
+				'ignore'		=> array(),
+				'filename'		=> '',
+				'format'		=> 'gzip', // gzip, zip, txt
+				'add_drop'		=> TRUE,
+				'add_insert'		=> TRUE,
+				'newline'		=> "\n"
+			);
 
 		// Did the user submit any preferences? If so set them....
 		if (count($params) > 0)
@@ -368,12 +327,12 @@ abstract class CI_DB_utility {
 
 		// Is the encoder supported? If not, we'll either issue an
 		// error or use plain text depending on the debug settings
-		if (($prefs['format'] === 'gzip' && ! function_exists('gzencode'))
-			OR ($prefs['format'] === 'zip' && ! function_exists('gzcompress')))
+		if (($prefs['format'] === 'gzip' && ! @function_exists('gzencode'))
+			OR ($prefs['format'] === 'zip' && ! @function_exists('gzcompress')))
 		{
 			if ($this->db->db_debug)
 			{
-				return $this->db->display_error('db_unsupported_compression');
+				return $this->db->display_error('db_unsuported_compression');
 			}
 
 			$prefs['format'] = 'txt';
@@ -422,3 +381,6 @@ abstract class CI_DB_utility {
 	}
 
 }
+
+/* End of file DB_utility.php */
+/* Location: ./system/database/DB_utility.php */

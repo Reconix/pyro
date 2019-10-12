@@ -1,41 +1,29 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP
+ * An open source application development framework for PHP 5.2.4 or newer
  *
- * This content is released under the MIT License (MIT)
+ * NOTICE OF LICENSE
  *
- * Copyright (c) 2014 - 2016, British Columbia Institute of Technology
+ * Licensed under the Open Software License version 3.0
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This source file is subject to the Open Software License (OSL 3.0) that is
+ * bundled with this package in the files license.txt / license.rst.  It is
+ * also available through the world wide web at this URL:
+ * http://opensource.org/licenses/OSL-3.0
+ * If you did not receive a copy of the license and are unable to obtain it
+ * through the world wide web, please send an email to
+ * licensing@ellislab.com so we can send you a copy immediately.
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @package	CodeIgniter
- * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
- * @license	http://opensource.org/licenses/MIT	MIT License
- * @link	https://codeigniter.com
- * @since	Version 3.0.0
+ * @package		CodeIgniter
+ * @author		EllisLab Dev Team
+ * @copyright	Copyright (c) 2008 - 2012, EllisLab, Inc. (http://ellislab.com/)
+ * @license		http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
+ * @link		http://codeigniter.com
+ * @since		Version 3.0.0
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
  * PDO DBLIB Database Adapter Class
@@ -48,44 +36,22 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Drivers
  * @category	Database
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/database/
+ * @link		http://codeigniter.com/user_guide/database/
  */
 class CI_DB_pdo_dblib_driver extends CI_DB_pdo_driver {
 
-	/**
-	 * Sub-driver
-	 *
-	 * @var	string
-	 */
 	public $subdriver = 'dblib';
 
-	// --------------------------------------------------------------------
+	protected $_random_keyword = ' NEWID()';
 
-	/**
-	 * ORDER BY random keyword
-	 *
-	 * @var	array
-	 */
-	protected $_random_keyword = array('NEWID()', 'RAND(%d)');
-
-	/**
-	 * Quoted identifier flag
-	 *
-	 * Whether to use SQL-92 standard quoted identifier
-	 * (double quotes) or brackets for identifier escaping.
-	 *
-	 * @var	bool
-	 */
 	protected $_quoted_identifier;
 
-	// --------------------------------------------------------------------
-
 	/**
-	 * Class constructor
+	 * Constructor
 	 *
 	 * Builds the DSN if not already set.
 	 *
-	 * @param	array	$params
+	 * @param	array
 	 * @return	void
 	 */
 	public function __construct($params)
@@ -119,9 +85,9 @@ class CI_DB_pdo_dblib_driver extends CI_DB_pdo_driver {
 	// --------------------------------------------------------------------
 
 	/**
-	 * Database connection
+	 * Non-persistent database connection
 	 *
-	 * @param	bool	$persistent
+	 * @param	bool
 	 * @return	object
 	 */
 	public function db_connect($persistent = FALSE)
@@ -149,12 +115,12 @@ class CI_DB_pdo_dblib_driver extends CI_DB_pdo_driver {
 	 *
 	 * Generates a platform-specific query string so that the table names can be fetched
 	 *
-	 * @param	bool	$prefix_limit
+	 * @param	bool
 	 * @return	string
 	 */
 	protected function _list_tables($prefix_limit = FALSE)
 	{
-		$sql = 'SELECT '.$this->escape_identifiers('name')
+		return 'SELECT '.$this->escape_identifiers('name')
 			.' FROM '.$this->escape_identifiers('sysobjects')
 			.' WHERE '.$this->escape_identifiers('type')." = 'U'";
 
@@ -174,47 +140,30 @@ class CI_DB_pdo_dblib_driver extends CI_DB_pdo_driver {
 	 *
 	 * Generates a platform-specific query string so that the column names can be fetched
 	 *
-	 * @param	string	$table
+	 * @param	string	the table name
 	 * @return	string
 	 */
 	protected function _list_columns($table = '')
 	{
-		return 'SELECT COLUMN_NAME
-			FROM INFORMATION_SCHEMA.Columns
-			WHERE UPPER(TABLE_NAME) = '.$this->escape(strtoupper($table));
+		return 'SELECT '.$this->escape_identifiers('column_name')
+				.' FROM '.$this->escape_identifiers('information_schema.columns')
+				.' WHERE '.$this->escape_identifiers('table_name').' = '.$this->escape($table);
 	}
 
 	// --------------------------------------------------------------------
 
 	/**
-	 * Returns an object with field data
+	 * From Tables
 	 *
-	 * @param	string	$table
-	 * @return	array
+	 * This function implicitly groups FROM tables so there is no confusion
+	 * about operator precedence in harmony with SQL standards
+	 *
+	 * @param	array
+	 * @return	string
 	 */
-	public function field_data($table)
+	protected function _from_tables($tables)
 	{
-		$sql = 'SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, COLUMN_DEFAULT
-			FROM INFORMATION_SCHEMA.Columns
-			WHERE UPPER(TABLE_NAME) = '.$this->escape(strtoupper($table));
-
-		if (($query = $this->query($sql)) === FALSE)
-		{
-			return FALSE;
-		}
-		$query = $query->result_object();
-
-		$retval = array();
-		for ($i = 0, $c = count($query); $i < $c; $i++)
-		{
-			$retval[$i]			= new stdClass();
-			$retval[$i]->name		= $query[$i]->COLUMN_NAME;
-			$retval[$i]->type		= $query[$i]->DATA_TYPE;
-			$retval[$i]->max_length		= ($query[$i]->CHARACTER_MAXIMUM_LENGTH > 0) ? $query[$i]->CHARACTER_MAXIMUM_LENGTH : $query[$i]->NUMERIC_PRECISION;
-			$retval[$i]->default		= $query[$i]->COLUMN_DEFAULT;
-		}
-
-		return $retval;
+		return is_array($tables) ? implode(', ', $tables) : $tables;
 	}
 
 	// --------------------------------------------------------------------
@@ -224,15 +173,29 @@ class CI_DB_pdo_dblib_driver extends CI_DB_pdo_driver {
 	 *
 	 * Generates a platform-specific update string from the supplied data
 	 *
-	 * @param	string	$table
-	 * @param	array	$values
+	 * @param	string	the table name
+	 * @param	array	the update data
+	 * @param	array	the where clause
+	 * @param	array	the orderby clause (ignored)
+	 * @param	array	the limit clause (ignored)
+	 * @param	array	the like clause
 	 * @return	string
-	 */
-	protected function _update($table, $values)
+         */
+	protected function _update($table, $values, $where, $orderby = array(), $limit = FALSE, $like = array())
 	{
-		$this->qb_limit = FALSE;
-		$this->qb_orderby = array();
-		return parent::_update($table, $values);
+		foreach ($values as $key => $val)
+		{
+			$valstr[] = $key.' = '.$val;
+		}
+
+		$where = empty($where) ? '' : ' WHERE '.implode(' ', $where);
+
+		if ( ! empty($like))
+		{
+			$where .= ($where === '' ? ' WHERE ' : ' AND ').implode(' ', $like);
+		}
+
+		return 'UPDATE '.$table.' SET '.implode(', ', $valstr).$where;
 	}
 
 	// --------------------------------------------------------------------
@@ -242,91 +205,61 @@ class CI_DB_pdo_dblib_driver extends CI_DB_pdo_driver {
 	 *
 	 * Generates a platform-specific delete string from the supplied data
 	 *
-	 * @param	string	$table
+	 * @param	string	the table name
+	 * @param	array	the where clause
+	 * @param	array	the like clause
+	 * @param	string	the limit clause
 	 * @return	string
 	 */
-	protected function _delete($table)
+	protected function _delete($table, $where = array(), $like = array(), $limit = FALSE)
 	{
-		if ($this->qb_limit)
-		{
-			return 'WITH ci_delete AS (SELECT TOP '.$this->qb_limit.' * FROM '.$table.$this->_compile_wh('qb_where').') DELETE FROM ci_delete';
-		}
+		$conditions = array();
 
-		return parent::_delete($table);
+		empty($where) OR $conditions[] = implode(' ', $where);
+		empty($like) OR $conditions[] = implode(' ', $like);
+
+		$conditions = (count($conditions) > 0) ? ' WHERE '.implode(' AND ', $conditions) : '';
+
+		return ($limit)
+			? 'WITH ci_delete AS (SELECT TOP '.$limit.' * FROM '.$table.$conditions.') DELETE FROM ci_delete'
+			: 'DELETE FROM '.$table.$conditions;
 	}
 
 	// --------------------------------------------------------------------
 
 	/**
-	 * LIMIT
+	 * Limit string
 	 *
 	 * Generates a platform-specific LIMIT clause
 	 *
-	 * @param	string	$sql	SQL Query
+	 * @param	string	the sql query string
+	 * @param	int	the number of rows to limit the query to
+	 * @param	int	the offset value
 	 * @return	string
 	 */
-	protected function _limit($sql)
+	protected function _limit($sql, $limit, $offset)
 	{
-		$limit = $this->qb_offset + $this->qb_limit;
+		$limit = $offset + $limit;
 
 		// As of SQL Server 2005 (9.0.*) ROW_NUMBER() is supported,
 		// however an ORDER BY clause is required for it to work
-		if (version_compare($this->version(), '9', '>=') && $this->qb_offset && ! empty($this->qb_orderby))
+		if (version_compare($this->version(), '9', '>=') && $offset && ! empty($this->qb_orderby))
 		{
-			$orderby = $this->_compile_order_by();
+			$orderby = 'ORDER BY '.implode(', ', $this->qb_orderby);
 
 			// We have to strip the ORDER BY clause
-			$sql = trim(substr($sql, 0, strrpos($sql, $orderby)));
+			$sql = trim(substr($sql, 0, strrpos($sql, 'ORDER BY '.$orderby)));
 
-			// Get the fields to select from our subquery, so that we can avoid CI_rownum appearing in the actual results
-			if (count($this->qb_select) === 0)
-			{
-				$select = '*'; // Inevitable
-			}
-			else
-			{
-				// Use only field names and their aliases, everything else is out of our scope.
-				$select = array();
-				$field_regexp = ($this->_quoted_identifier)
-					? '("[^\"]+")' : '(\[[^\]]+\])';
-				for ($i = 0, $c = count($this->qb_select); $i < $c; $i++)
-				{
-					$select[] = preg_match('/(?:\s|\.)'.$field_regexp.'$/i', $this->qb_select[$i], $m)
-						? $m[1] : $this->qb_select[$i];
-				}
-				$select = implode(', ', $select);
-			}
-
-			return 'SELECT '.$select." FROM (\n\n"
-				.preg_replace('/^(SELECT( DISTINCT)?)/i', '\\1 ROW_NUMBER() OVER('.trim($orderby).') AS '.$this->escape_identifiers('CI_rownum').', ', $sql)
-				."\n\n) ".$this->escape_identifiers('CI_subquery')
-				."\nWHERE ".$this->escape_identifiers('CI_rownum').' BETWEEN '.($this->qb_offset + 1).' AND '.$limit;
+			return 'SELECT '.(count($this->qb_select) === 0 ? '*' : implode(', ', $this->qb_select))." FROM (\n"
+				.preg_replace('/^(SELECT( DISTINCT)?)/i', '\\1 ROW_NUMBER() OVER('.$orderby.') AS '.$this->escape_identifiers('CI_rownum').', ', $sql)
+				."\n) ".$this->escape_identifiers('CI_subquery')
+				."\nWHERE ".$this->escape_identifiers('CI_rownum').' BETWEEN '.((int) $offset + 1).' AND '.$limit;
 		}
 
 		return preg_replace('/(^\SELECT (DISTINCT)?)/i','\\1 TOP '.$limit.' ', $sql);
 	}
 
-	// --------------------------------------------------------------------
-
-	/**
-	 * Insert batch statement
-	 *
-	 * Generates a platform-specific insert string from the supplied data.
-	 *
-	 * @param	string	$table	Table name
-	 * @param	array	$keys	INSERT keys
-	 * @param	array	$values	INSERT values
-	 * @return	string|bool
-	 */
-	protected function _insert_batch($table, $keys, $values)
-	{
-		// Multiple-value inserts are only supported as of SQL Server 2008
-		if (version_compare($this->version(), '10', '>='))
-		{
-			return parent::_insert_batch($table, $keys, $values);
-		}
-
-		return ($this->db->db_debug) ? $this->db->display_error('db_unsupported_feature') : FALSE;
-	}
-
 }
+
+/* End of file pdo_dblib_driver.php */
+/* Location: ./system/database/drivers/pdo/subdrivers/pdo_dblib_driver.php */
