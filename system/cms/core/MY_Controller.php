@@ -4,7 +4,7 @@ require APPPATH."libraries/MX/Controller.php";
 
 /**
  * Code here is run before ALL controllers
- * 
+ *
  * @package 	PyroCMS\Core\Controllers
  * @author      PyroCMS Dev Team
  * @copyright   Copyright (c) 2012, PyroCMS LLC
@@ -15,7 +15,7 @@ class MY_Controller extends MX_Controller
 	/**
 	 * The name of the module that this controller instance actually belongs to.
 	 *
-	 * @var string 
+	 * @var string
 	 */
 	public $module;
 
@@ -29,7 +29,7 @@ class MY_Controller extends MX_Controller
 	/**
 	 * The name of the method for the current request.
 	 *
-	 * @var string 
+	 * @var string
 	 */
 	public $method;
 
@@ -41,7 +41,7 @@ class MY_Controller extends MX_Controller
 		parent::__construct();
 
 		$this->benchmark->mark('my_controller_start');
-		
+
 		// No record? Probably DNS'ed but not added to multisite
 		if ( ! defined('SITE_REF'))
 		{
@@ -59,7 +59,7 @@ class MY_Controller extends MX_Controller
 
 		// Migration logic helps to make sure PyroCMS is running the latest changes
 		$this->load->library('migration');
-		
+
 		if ( ! ($schema_version = $this->migration->current()))
 		{
 			show_error($this->migration->error_string());
@@ -79,7 +79,7 @@ class MY_Controller extends MX_Controller
 		{
 			$site_public_lang = explode(',', Settings::get('site_public_lang'));
 
-			if (in_array(AUTO_LANGUAGE, $site_public_lang))
+			if (in_array('AUTO_LANGUAGE', $site_public_lang))
 			{
 				$site_lang = AUTO_LANGUAGE;
 			}
@@ -114,7 +114,7 @@ class MY_Controller extends MX_Controller
 		}
 
 		// Reload languages
-		if (AUTO_LANGUAGE !== CURRENT_LANGUAGE)
+		if ('AUTO_LANGUAGE' !== CURRENT_LANGUAGE)
 		{
 			$this->config->set_item('language', $langs[CURRENT_LANGUAGE]['folder']);
 			$this->lang->is_loaded = array();
@@ -206,9 +206,9 @@ class MY_Controller extends MX_Controller
 		}
 
 		$this->load->vars($pyro);
-		
+
 		$this->benchmark->mark('my_controller_end');
-		
+
 		// Enable profiler on local box
 	    if ((isset($this->current_user->group) and $this->current_user->group === 'admin') and is_array($_GET) and array_key_exists('_debug', $_GET))
 	    {
