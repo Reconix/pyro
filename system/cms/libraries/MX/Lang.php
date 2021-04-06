@@ -1,4 +1,5 @@
-<?php (defined('BASEPATH')) OR exit('No direct script access allowed');
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
 
 /**
  * Modular Extensions - HMVC
@@ -13,7 +14,7 @@
  * Install this file as application/third_party/MX/Lang.php
  *
  * @copyright	Copyright (c) 2011 Wiredesignz
- * @version 	5.4
+ * @version 	5.6.2
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,61 +36,40 @@
  **/
 class MX_Lang extends CI_Lang
 {
-	public static $fall_back = 'english';
+    public function load($langfile, $lang = '', $return = false, $add_suffix = true, $alt_path = '', $_module = '')
+    {
+        if (is_array($langfile)) {
+            foreach ($langfile as $_lang) {
+                $this->load($_lang);
+            }
+            return $this->language;
+        }
 
-	public function load($langfile = '', $lang = '', $return = false, $add_suffix = true, $alt_path = '', $_module = '')	{
+        $deft_lang = CI::$APP->config->item('language');
+        $idiom = ($lang === '') ? $deft_lang : $lang;
 
-		if (is_array($langfile)) {
-			foreach($langfile as $_lang) $this->load($_lang);
-			return $this->language;
-		}
+        if (in_array($langfile.'_lang'.EXT, $this->is_loaded, true)) {
+            return $this->language;
+        }
 
-		if ( ! class_exists('CI'))
-		{
-			exit('An error has occured that cannot be reported correctly. Check your database settings.');
-		}
+        $_module or $_module = CI::$APP->router->fetch_module();
+        [$path, $_langfile] = Modules::find($langfile.'_lang', $_module, 'language/'.$idiom.'/');
 
-		$deft_lang = CI::$APP->config->item('language');
-		$idiom = ($lang == '') ? $deft_lang : $lang;
+        if ($path === false) {
+            if ($lang = parent::load($langfile, $lang, $return, $add_suffix, $alt_path)) {
+                return $lang;
+            }
+        } else {
+            if ($lang = Modules::load_file($_langfile, $path, 'lang')) {
+                if ($return) {
+                    return $lang;
+                }
+                $this->language = array_merge($this->language, $lang);
+                $this->is_loaded[] = $langfile.'_lang'.EXT;
+                unset($lang);
+            }
+        }
 
-		if (in_array($langfile . '_lang'.EXT, $this->is_loaded, true))
-		{
-			return $this->language;
-		}
-
-		$_module OR $_module = CI::$APP->router->fetch_module();
-		list($path, $_langfile) = Modules::find($langfile . '_lang', $_module, 'language/' . $idiom . '/');
-
-		// Falls back to a default language if the current language file is missing.
-		if ($path === false && self::$fall_back)
-		{
-			list($path, $_langfile) = Modules::find($langfile . '_lang', $_module, 'language/' . self::$fall_back . '/');
-		}
-
-		if ($path === false)
-		{
-			if ($lang = parent::load($langfile, $lang, $return, $add_suffix, $alt_path))
-			{
-				return $lang;
-			}
-
-		}
-
-		else
-		{
-			if ($lang = Modules::load_file($_langfile, $path, 'lang'))
-			{
-				if ($return)
-				{
-					return $lang;
-				}
-
-				$this->language = array_merge($this->language, $lang);
-				$this->is_loaded[] = $langfile . '_lang'.EXT;
-				unset($lang);
-			}
-		}
-
-		return $this->language;
-	}
+        return $this->language;
+    }
 }
